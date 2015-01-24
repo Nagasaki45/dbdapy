@@ -9,4 +9,4 @@ p_negative_given_ill = 1 - p_positive_given_ill
 p_positive = p_positive_given_ill * p_ill + p_positive_given_healthy * p_healthy
 p_negative = 1 - p_positive
 p_ill_given_negative = p_negative_given_ill * p_ill / p_negative
-print(p_ill_given_negative)  # 0.01943463
+print(p_ill_given_negative)  # 0.0002085862
