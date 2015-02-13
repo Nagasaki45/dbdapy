@@ -1,10 +1,21 @@
-p_ill = 0.001
-p_healthy = 1 - p_ill
-p_positive_given_ill = 0.99
-p_positive_given_healthy = 0.05
+N = sum(HairEyeColor)
 
-# Find p(ill | positive)
-# p(ill | positive) = p(positive | ill) * p(ill) / p(positive)
-p_positive = p_positive_given_ill * p_ill + p_positive_given_healthy * p_healthy
-p_ill_given_positive = p_positive_given_ill * p_ill / p_positive
-print(p_ill_given_positive)  # 0.01943463
+print('Hair / eye proportion')
+hair_eye_prop = apply(HairEyeColor, c('Eye', 'Hair'), sum)/ N
+print(round(hair_eye_prop, 2))
+
+print('Hair proportion')
+hair_prop = apply(HairEyeColor, c('Hair'), sum)/ N
+print(round(hair_prop, 2))
+
+print('Eye proportion')
+eye_prop= apply(HairEyeColor, c('Eye'), sum) / N
+print(round(eye_prop, 2))
+
+print('P(eye | hair=Brown)')
+eye_g_brown = hair_eye_prop[,'Brown'] / hair_prop['Brown']
+print(round(eye_g_brown, 2))
+
+print('P(hair | eye=Brown)')
+hair_g_brown = hair_eye_prop['Brown',] / eye_prop['Brown']
+print(round(hair_g_brown, 2))

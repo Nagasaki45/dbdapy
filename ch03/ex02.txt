@@ -1,2 +1,0 @@
-A) There are totally 8 cards of 'ten'. Hence the probability is 8 / 48 = 1/6
-B) There are 16 'ten's and 'Jack's. Hence the probability is 16 / 48 = 2/6

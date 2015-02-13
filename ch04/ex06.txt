@@ -1,19 +1,10 @@
-theta: the probability for head
-p(theta=.25) = .25
-p(theta=.5)  = .5
-p(theta=.75) = .25
+          Ice cream  Fruit  French fries  Marginal
+1         .06        .12    .02           .2
+6         .12        .06    .02           .2
+11        .18        .06    .36           .6
+Marginal  .36        .24    .4            1
 
-D = 3 heads and 9 tails
-
-p(D) = sum(p(D|theta) * p(theta) for theta in model)
-
-p(D|theta=.25) = .25 ^ 3 * .75 ^ 9 = 0.0011731982
-p(D|theta=.5) = .5 ^ 3 * .5 ^ 9 = .5 ^ 12 = 0.0002441406
-p(D|theta=.75) = .75 ^ 3 * .25 ^ 3 = 0.0000016093
-p(D) = 0.0004157722
-
-p(theta|D) = p(D|theta) * p(theta) / p(D)
-
-p(theta=.25|D) = 0.7054333023
-p(theta=.5|D)  = 0.2935990252
-p(theta=.75|D) = 0.0009676726
+False asumption that grade and favorite food are independend yields:
+p(French fries | 11th grade) = p(French fries) = .4
+whereas
+p(French fries | 11th grade) = p(French fries, 11th grade) / p(11th grade) = .36 / .6 = .6 != .4

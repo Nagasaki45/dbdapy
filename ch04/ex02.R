@@ -1,12 +1,12 @@
-p_ill = 0.01943463  # Prior updated by ex01 posterior
-p_healthy = 1 - p_ill
-p_positive_given_ill = 0.99
-p_positive_given_healthy = 0.05
-p_negative_given_ill = 1 - p_positive_given_ill
+N = 500
+n = 1:N  # Flip number vector
 
-# Find p(ill | negative)
-# p(ill | negative) = p(negative | ill) * p(ill) / p(negative)
-p_positive = p_positive_given_ill * p_ill + p_positive_given_healthy * p_healthy
-p_negative = 1 - p_positive
-p_ill_given_negative = p_negative_given_ill * p_ill / p_negative
-print(p_ill_given_negative)  # 0.0002085862
+p_head = .8  # Probability to get a Head
+coinFlips = sample(x=c(0, 1), prob=c(1 - p_head, p_head), size=N, replace=TRUE)
+runningAvg = cumsum(coinFlips) / n
+
+# Plot
+plot(n, runningAvg, log="x", type='l', ylim=c(0, 1))
+lines(c(1, N), c(.8, .8), lty=2)  # Line type = 2 for dashed line. See 'par' help.
+# adj=1 let R adjust the x positioning of the text freely
+text(N, 0.5, paste("End Proportion =", runningAvg[N]), adj=1)

@@ -1,18 +1,2 @@
-    :(    :)
-+   99    0.05 * 99,900 = 4,995    99 + 4,995 = 5,094
--   1     99,900 - 4,995 = 94,905  94,906
-    100   99,900                   100,000
-
-
-B) Ill people from those with positive results: 99 / 5,094 = 0.01943463
-
-C)                N = 10,000,000
-       * p :(     /            \     * p :)
-               10,000       9,990,000
-       * p +|:(  |              |    * p +|:)
-                9,900         499,500
-       * p -|:(  |              |    * p -|:)
-                   99         474,525 (From 10M, num of once positive onec negative)
-
-D) 99 / (99 + 474,525) = 0.00020858616504854368
-   The above is equal to the computationally result of ex02.
+A) There are totally 8 cards of 'ten'. Hence the probability is 8 / 48 = 1/6
+B) There are 16 'ten's and 'Jack's. Hence the probability is 16 / 48 = 2/6
