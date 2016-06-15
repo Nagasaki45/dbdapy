@@ -1,3 +1,4 @@
 *.pdf
 __pycache__
+.ipynb_checkpoints
 DBDA2Eprograms
