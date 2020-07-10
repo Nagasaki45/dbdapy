@@ -1,5 +1,6 @@
 import itertools
 
+import numpy as np
 from scipy import stats
 
 
@@ -28,3 +29,13 @@ def ess(trace):
     N = len(trace)
     denominator = 1 + 2 * sum(significant_autocorrelations)
     return N / denominator
+
+
+def acceptance_ratio(trace, min_diff=0.0001):
+    '''
+    The ratio of steps differing by at least `min_diff`.
+    '''
+    diffs = np.array(trace[1:]) - np.array(trace[:-1])
+    abs_diff = np.abs(diffs)
+    accepted_steps = abs_diff > min_diff
+    return sum(accepted_steps) / len(accepted_steps)
