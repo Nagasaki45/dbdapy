@@ -1,6 +1,7 @@
 matplotlib
 notebook
 numpy
+pyjags
 pymc3
 scipy
 seaborn

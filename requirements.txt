@@ -4,13 +4,14 @@
 #
 #    pip-compile
 #
-arviz==0.8.3              # via pymc3
+arviz==0.8.3              # via pyjags, pymc3
 attrs==19.3.0             # via jsonschema
 backcall==0.2.0           # via ipython
 bleach==3.1.5             # via nbconvert
 cftime==1.1.3             # via netcdf4
 cycler==0.10.0            # via matplotlib
 decorator==4.4.2          # via ipython, traitlets
+deepdish==0.3.6           # via pyjags
 defusedxml==0.6.0         # via nbconvert
 entrypoints==0.3          # via nbconvert
 fastprogress==0.2.3       # via pymc3
@@ -31,7 +32,8 @@ nbconvert==5.6.1          # via notebook
 nbformat==5.0.7           # via nbconvert, notebook
 netcdf4==1.5.3            # via arviz
 notebook==6.0.3           # via -r requirements.in
-numpy==1.18.5             # via -r requirements.in, arviz, cftime, h5py, matplotlib, netcdf4, pandas, patsy, pymc3, scipy, seaborn, theano, xarray
+numexpr==2.7.1            # via tables
+numpy==1.18.5             # via -r requirements.in, arviz, cftime, deepdish, h5py, matplotlib, netcdf4, numexpr, pandas, patsy, pyjags, pymc3, scipy, seaborn, tables, theano, xarray
 packaging==20.4           # via arviz, bleach
 pandas==1.0.4             # via arviz, pymc3, seaborn, xarray
 pandocfilters==1.4.2      # via nbconvert
@@ -43,16 +45,18 @@ prometheus-client==0.8.0  # via notebook
 prompt-toolkit==3.0.5     # via ipython
 ptyprocess==0.6.0         # via pexpect, terminado
 pygments==2.6.1           # via ipython, nbconvert
+pyjags==1.3.6             # via -r requirements.in
 pymc3==3.9.1              # via -r requirements.in
 pyparsing==2.4.7          # via matplotlib, packaging
 pyrsistent==0.16.0        # via jsonschema
 python-dateutil==2.8.1    # via jupyter-client, matplotlib, pandas
 pytz==2020.1              # via pandas
 pyzmq==19.0.1             # via jupyter-client, notebook
-scipy==1.4.1              # via -r requirements.in, arviz, pymc3, seaborn, theano
+scipy==1.4.1              # via -r requirements.in, arviz, deepdish, pymc3, seaborn, theano
 seaborn==0.10.1           # via -r requirements.in
 send2trash==1.5.0         # via notebook
 six==1.15.0               # via bleach, cycler, h5py, jsonschema, packaging, patsy, pyrsistent, python-dateutil, theano, traitlets
+tables==3.6.1             # via deepdish
 terminado==0.8.3          # via notebook
 testpath==0.4.4           # via nbconvert
 theano==1.0.4             # via pymc3
