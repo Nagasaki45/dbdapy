@@ -1,6 +1,6 @@
 # Following "Doing Bayesian Data Analysis", in python
 
-Python solutions to the exercises of Doing Bayesian Data Analysis, 2nd Edition, by J. L. Kruschke, using [pymc3](https://github.com/pymc-devs/pymc3).
+Python solutions to the exercises of Doing Bayesian Data Analysis, 2nd Edition, by J. L. Kruschke.
 
 ## Why?
 

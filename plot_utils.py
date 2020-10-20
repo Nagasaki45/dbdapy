@@ -115,3 +115,27 @@ def shrinkage(percentage_correct : np.ndarray, estimates : np.ndarray, ax=None):
     ax.spines['left'].set_visible(False)
 
     return ax
+
+
+def param_comparison(trace, param, comparison, scatter_sample=30, axes=None):
+
+    if axes is None:
+        n = len(comparison)
+        _, axes = plt.subplots(nrows=n, ncols=n, figsize=(8, 8))
+
+    x = trace[param]
+
+    sample = np.random.randint(len(x[-1]), size=scatter_sample)
+
+    for i, first in enumerate(comparison):
+        dist(x[first], ax=axes[i, i])
+        axes[i, i].set(title=f'{param}[{first}]')
+        for j, second in enumerate(comparison[i + 1:], start=i + 1):
+            dist(x[first] - x[second], ax=axes[i, j])
+            axes[i, j].set(title=f'{param}[{first}] - {param}[{second}]')
+            axes[j, i].scatter(x[first][sample], x[second][sample])
+            axes[j, i].set(xlabel=f'{param}[{first}]', ylabel=f'{param}[{second}]')
+
+    plt.gcf().tight_layout()
+
+    return axes
