@@ -34,7 +34,7 @@ def dist(chains, ax=None):
 
     chain = chains.reshape(-1)
 
-    hdi_range = np.mean(np.apply_along_axis(np.percentile, 0, chains, [2.5, 97.5]), axis=1)
+    hdi_range = np.percentile(chain, [2.5, 97.5])
     mean = chain.mean()
 
     sns.distplot(chain, kde=False, ax=ax)

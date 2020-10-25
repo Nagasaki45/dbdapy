@@ -20,6 +20,8 @@ def ess(trace):
     Effective sample size, as defined in Kruschke's "Doing
     Bayesian Data Analysis", 2nd edition, p. 184.
     '''
+    if len(set(trace)) <= 1:
+        return float('nan')
     significant_autocorrelations = []
     for lag in itertools.count(start=1):
         autocorrelation = acf(trace, lag)
