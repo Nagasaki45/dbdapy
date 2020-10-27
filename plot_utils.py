@@ -24,7 +24,26 @@ def hdi(hdi_tails, *, ax=None):
     ax.plot(hdi_tails, [nodge, nodge], color='black', linewidth=2)
 
 
-def dist(chains, ax=None):
+def _dist(chain, density, ax, **kwargs):
+    sns.distplot(chain, kde=density, hist=not density, ax=ax, **kwargs)
+    ax.set(xlabel='param value', yticks=[])
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+
+
+def _dist_single_chain(chain, ax):
+
+    hdi_range = np.percentile(chain, [2.5, 97.5])
+    mean = chain.mean()
+
+    _dist(chain, density=False, ax=ax)
+    hdi(hdi_range, ax=ax)
+    ax.axvline(mean, color='gray', linestyle='--', linewidth=1)
+    ax.text(mean, np.mean(ax.get_ylim()), f'mean = {mean:.2f}', rotation=-90, color='grey')
+
+
+def dist(chains, compare_chains=False, ax=None):
     '''
     Plot distribution analysis of one or more chains
     '''
@@ -32,26 +51,72 @@ def dist(chains, ax=None):
     if ax is None:
         ax = plt.gca()
 
-    chain = chains.reshape(-1)
-
-    hdi_range = np.percentile(chain, [2.5, 97.5])
-    mean = chain.mean()
-
-    sns.distplot(chain, kde=False, ax=ax)
-    hdi(hdi_range, ax=ax)
-    ax.axvline(mean, color='gray', linestyle='--', linewidth=1)
-    ax.text(mean, np.mean(ax.get_ylim()), f'mean = {mean:.2f}', rotation=-90, color='grey')
-
-    ax.set_yticks([])
-
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['left'].set_visible(False)
+    if compare_chains:
+        for chain in chains.T:
+            _dist(chain, density=True, kde_kws={'linewidth': 1, 'alpha': 0.5}, ax=ax)
+    else:
+        _dist_single_chain(chains.reshape(-1), ax=ax)
 
     return ax
 
 
-def trace(chains : np.ndarray, axes : typing.List[matplotlib.axes.Axes]=None):
+def _annotate(text, ax):
+    ax.annotate(
+        text,
+        xy=(0.975, 0.975),
+        xycoords='axes fraction',
+        verticalalignment='top',
+        horizontalalignment='right',
+    )
+
+
+def trace(chains : np.ndarray, ax=None):
+    '''
+    Trace plot.
+    '''
+    ess = np.sum(np.apply_along_axis(mcmc_utils.ess, 0, chains))
+    acc_ratio = np.mean(np.apply_along_axis(mcmc_utils.acceptance_ratio, 0, chains))
+
+    if ax is None:
+        ax = plt.gca()
+
+    ax.plot(chains, linewidth=0.5, alpha=0.5)
+    ax.set(xlabel='iterations', ylabel='param value')
+    _annotate(f'Eff.Sz = {ess:.1f}\nAcceptance ratio = {acc_ratio:.3f}', ax)
+
+    return ax
+
+
+def autocorrelation(chains: np.ndarray, max_lag=30, ax=None):
+    '''
+    Autocorrelation plot
+    '''
+    if ax is None:
+        ax = plt.gca()
+
+    acs = np.apply_along_axis(
+        lambda x: mcmc_utils.autocorrelations(x, max_lag),
+        0,
+        chains,
+    )
+
+    ax.plot(np.arange(max_lag) + 1, acs)
+
+    return ax
+
+
+def dist_and_trace(chains, axes=None):
+    '''
+    Helper to plot dist and trace side by side.
+    '''
+    if axes is None:
+        _, axes = plt.subplots(ncols=2, figsize=(8, 3))
+    dist(chains, ax=axes[0])
+    trace(chains, ax=axes[1])
+    return axes
+
+
+def trace_analysis(chains : np.ndarray, max_lag : int=30, axes : np.array=None):
     '''
     Plot trace analysis of one or more chains.
     '''
@@ -59,23 +124,29 @@ def trace(chains : np.ndarray, axes : typing.List[matplotlib.axes.Axes]=None):
         chains = chains[:, np.newaxis]
 
     ess = np.sum(np.apply_along_axis(mcmc_utils.ess, 0, chains))
-    acc_ratio = np.mean(np.apply_along_axis(mcmc_utils.acceptance_ratio, 0, chains))
+    mcse = np.std(chains) / np.sqrt(ess)
 
     if axes is None:
-        _, axes = plt.subplots(ncols=2, figsize=(8, 4))
-    else:
-        assert len(axes) == 2
+        _, axes = plt.subplots(nrows=2, ncols=2, figsize=(8, 5))
+    assert axes.shape == (2, 2)
 
-    dist(chains, ax=axes[0])
+    # Top left: trace plot
+    trace(chains, ax=axes[0, 0])
 
-    axes[1].plot(chains, linewidth=0.5, alpha=0.5)
-    axes[1].annotate(
-        f'Eff.Sz = {ess:.1f}\nAcceptance ratio = {acc_ratio:.3f}',
-        xy=(0.025, 0.975),
-        xycoords='axes fraction',
-        verticalalignment='top',
-    )
+    # Top right: lag analysis
+    autocorrelation(chains, ax=axes[0, 1])
+    axes[0, 1].set(xlabel='lag', ylabel='autocorrelation')
 
+    # Bottom left: shrink factor
+    running_gelman_rubin = list(mcmc_utils.running_gelman_rubin_gen(chains))
+    axes[1, 0].plot(np.arange(2, len(chains)), running_gelman_rubin)
+    axes[1, 0].set(xlabel='last iteration', ylabel='gelman-rubin')
+
+    # Bottom right: density
+    dist(chains, compare_chains=True, ax=axes[1, 1])
+    _annotate(f'MCSE = {mcse:.5f}', axes[1, 1])
+
+    plt.tight_layout()
     return axes
 
 
