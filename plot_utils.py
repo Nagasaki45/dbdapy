@@ -1,3 +1,4 @@
+import functools
 import typing
 
 import matplotlib
@@ -8,14 +9,25 @@ import seaborn as sns
 import mcmc_utils
 
 
-def hdi(hdi_tails, *, ax=None):
+def ax_plotter(f):
+    '''
+    A wrapper for functions that accept an ax and return an ax.
+    '''
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        if kwargs.get('ax') is None:
+            kwargs['ax'] = plt.gca()
+        f(*args, **kwargs)
+        return kwargs['ax']
+    return wrapper
+
+
+@ax_plotter
+def hdi(hdi_tails, ax):
     '''
     Plot a black line and HDI tails values at the
     bottom of the X axis.
     '''
-    if ax is None:
-        ax = plt.gca()
-
     nodge = ax.get_ylim()[1] / 40
 
     for tail in hdi_tails:
@@ -43,21 +55,16 @@ def _dist_single_chain(chain, ax):
     ax.text(mean, np.mean(ax.get_ylim()), f'mean = {mean:.2f}', rotation=-90, color='grey')
 
 
-def dist(chains, compare_chains=False, ax=None):
+@ax_plotter
+def dist(chains, ax, compare_chains=False):
     '''
     Plot distribution analysis of one or more chains
     '''
-
-    if ax is None:
-        ax = plt.gca()
-
     if compare_chains:
         for chain in chains.T:
             _dist(chain, density=True, kde_kws={'linewidth': 1, 'alpha': 0.5}, ax=ax)
     else:
         _dist_single_chain(chains.reshape(-1), ax=ax)
-
-    return ax
 
 
 def _annotate(text, ax):
@@ -70,30 +77,24 @@ def _annotate(text, ax):
     )
 
 
-def trace(chains : np.ndarray, ax=None):
+@ax_plotter
+def trace(chains : np.ndarray, ax):
     '''
     Trace plot.
     '''
     ess = np.sum(np.apply_along_axis(mcmc_utils.ess, 0, chains))
     acc_ratio = np.mean(np.apply_along_axis(mcmc_utils.acceptance_ratio, 0, chains))
 
-    if ax is None:
-        ax = plt.gca()
-
     ax.plot(chains, linewidth=0.5, alpha=0.5)
     ax.set(xlabel='iterations', ylabel='param value')
     _annotate(f'Eff.Sz = {ess:.1f}\nAcceptance ratio = {acc_ratio:.3f}', ax)
 
-    return ax
 
-
-def autocorrelation(chains: np.ndarray, max_lag=30, ax=None):
+@ax_plotter
+def autocorrelation(chains: np.ndarray, ax, max_lag=30):
     '''
     Autocorrelation plot
     '''
-    if ax is None:
-        ax = plt.gca()
-
     acs = np.apply_along_axis(
         lambda x: mcmc_utils.autocorrelations(x, max_lag),
         0,
@@ -101,8 +102,6 @@ def autocorrelation(chains: np.ndarray, max_lag=30, ax=None):
     )
 
     ax.plot(np.arange(max_lag) + 1, acs)
-
-    return ax
 
 
 def dist_and_trace(chains, axes=None):
@@ -150,7 +149,8 @@ def trace_analysis(chains : np.ndarray, max_lag : int=30, axes : np.array=None):
     return axes
 
 
-def shrinkage(percentage_correct : np.ndarray, estimates : np.ndarray, ax=None):
+@ax_plotter
+def shrinkage(percentage_correct : np.ndarray, estimates : np.ndarray, ax):
     '''
     Plot percentage correct and estimate to explore shrinkage.
     '''
@@ -158,9 +158,6 @@ def shrinkage(percentage_correct : np.ndarray, estimates : np.ndarray, ax=None):
     estimates = np.array(estimates)
 
     assert len(percentage_correct) == len(estimates)
-
-    if ax is None:
-        ax = plt.gca()
 
     ax.scatter(
         percentage_correct,
@@ -184,8 +181,6 @@ def shrinkage(percentage_correct : np.ndarray, estimates : np.ndarray, ax=None):
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.spines['left'].set_visible(False)
-
-    return ax
 
 
 def param_comparison(trace, param, comparison, scatter_sample=30, axes=None):
