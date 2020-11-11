@@ -1,6 +1,30 @@
 import collections
 
+import scipy.optimize as soptimize
+import scipy.stats as sstats
 
+
+def hdi(dist, interval_mass=.95):
+    '''
+    Calculate the HDI of a given distribution. Based on Kruschke's R code
+    and http://stackoverflow.com/a/25777507/1224456.
+
+    dist : most have ppf method to convert a probability to a parameter.
+    '''
+
+    def interval_width(low_tail_prob):
+        low_tail = dist.ppf(low_tail_prob)
+        high_tail = dist.ppf(low_tail_prob + interval_mass)
+        return high_tail - low_tail
+
+    # Find low_tail_probability that minimizes interval_width
+    low_tail_prob = 1 - interval_mass  # Initial value
+    res = soptimize.fmin(interval_width, low_tail_prob, disp=False)
+    low_tail_prob = res[0]
+    # Return interval as array([low, high])
+    return dist.ppf([low_tail_prob, low_tail_prob + interval_mass])
+
+  
 GammaParams = collections.namedtuple('GammaParams', ['shape', 'scale'])
 
 
@@ -34,3 +58,12 @@ def beta_params_from_w_and_k(w: float, k: float) -> BetaParams:
     # Calculations are based on info from wikipedia
     # https://en.wikipedia.org/wiki/Beta_distribution#Mode_and_concentration
     return BetaParams(w * (k - 2) + 1, (1 - w) * (k - 2) + 1)
+
+
+def update_beta(prior : sstats.beta, N : int, z : int):
+    '''
+    Update beta distribution prior with `z` positives in `N`
+    attempts.
+    '''
+    a, b = prior.args
+    return sstats.beta(a + z, b + N - z)  # See p. 132
